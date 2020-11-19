@@ -8,12 +8,39 @@
     <title>Mine-Sweeper</title>
 </head>
 
-<body>
-    <table border="1" cellpadding="10">
-        <tbody class="board">
+<body onload="initGame()">
 
-        </tbody>
-    </table>
+    <div class="nav-bar">
+        <span class="logo">
+            minesweeper
+        </span>
+    </div>
+    <div>
+        <table>
+            <tbody class="board">
+
+            </tbody>
+        </table>
+    </div>
+
+    <div class="menu">
+
+        <div class="levels">
+            <h3>choose your level</h3>
+            <button data-size="4" data-mines="3" onclick="setBoardSize(this)">4x4</button>
+            <button data-size="8" data-mines="6" onclick="setBoardSize(this)">8x8</button>
+            <button data-size="12" data-mines="30" onclick="setBoardSize(this)">12x12</button>
+        </div>
+        <div class="smily">
+            <button onclick="restart()"> 
+                <span>smily</span></button>
+        </div>
+        <div class="fails">
+            <span></span>
+        </div>
+    </div>
+
+    <script src="js/negs.js"></script>
     <script src="js/util.js"></script>
     <script src="js/game.js"></script>
 </body>

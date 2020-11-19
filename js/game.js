@@ -1,16 +1,48 @@
 'use strict'
 var MINE = '💣';
 var FLAG = '🚩';
+var gLevel = {
+        SIZE: null,
+        MINES: null
+    }
+    // gLevel.SIZE = setBoardSize()
 var minesAroundCount = 0;
 var gMinesCountArr = [];
 console.log(gMinesCountArr);
 var gIdxArr = [];
+var gBoard;
+var gColorCell;
+var gGame = {
+    isOn: false,
+    shownCount: 0,
+    markedCount: 0,
+    secsPassed: 0
+}
+var gClickOnMineCount = 0;
+// var gInterval;
+
+function setBoardSize(elBtn) {
+    gLevel.SIZE = +elBtn.dataset.size;
+    gLevel.MINES = +elBtn.dataset.mines;
+    initGame();
+}
+
+function initGame() {
+    document.querySelector('.smily span').innerText = '😀';
+    document.querySelector('.fails span').innerText = '⭕⭕⭕';
+    gGame.isOn = true;
+    gBoard = createBoard();
+    console.log(gBoard);
+    printMat(gBoard, '.board');
+    // document.querySelector('.board').style.display = 'block';
+
+}
 
 function createBoard() {
     var board = [];
-    for (var i = 0; i < 4; i++) {
+    for (var i = 0; i < gLevel.SIZE; i++) {
         board.push([]);
-        for (var j = 0; j < 4; j++) {
+        for (var j = 0; j < gLevel.SIZE; j++) {
             board[i][j] = {
                 minesAroundCount: 0,
                 isShown: false,
@@ -20,22 +52,22 @@ function createBoard() {
             }
         }
     }
-    for (var h = 0; h < 2; h++) {
-        var randomI = parseInt(getRandomInt(0, 4));
-        var randomJ = parseInt(getRandomInt(0, 4));
+    for (var h = 0; h < gLevel.MINES; h++) {
+        var randomI = parseInt(getRandomInt(0, gLevel.SIZE));
+        var randomJ = parseInt(getRandomInt(0, gLevel.SIZE));
         // board[randomI][randomJ].isMine = true;
         board[randomI][randomJ] = MINE;
     }
     setMinesNegsCount(board);
     return board
 }
-var gBoard = createBoard();
-console.log(gBoard);
-printMat(gBoard, '.board');
+
 
 function getRandomInt(min, max) {
     return Math.random() * (max - min) + min;
 }
+
+
 
 function printMat(mat, selector) {
     var strHTML = '<table border="0"><tbody>';
@@ -43,13 +75,15 @@ function printMat(mat, selector) {
         strHTML += '<tr>';
         for (var j = 0; j < mat[0].length; j++) {
             var cell = mat[i][j]
-            if (cell === MINE) {
-                // var className = cell ? 'occupied' : ''
-                var className = '';
-                strHTML += `<td data-i="${i}" data-j="${j}" onclick="cellClicked(this)" class="${className}">${' '}</td>`
-            } else {
-                var className = '';
-                strHTML += `<td data-i="${i}" data-j="${j}" onclick="cellClicked(this)" class="${className}"> ${' '} </td>`
+            if (gGame.isOn) {
+                if (cell === MINE) {
+                    // var className = cell ? 'occupied' : ''
+                    var className = '';
+                    strHTML += `<td data-i="${i}" data-j="${j}" onclick="cellClicked(this)" class="${className}">${' '}</td>`
+                } else {
+                    var className = '';
+                    strHTML += `<td data-i="${i}" data-j="${j}" onclick="cellClicked(this)" class="${className}"> ${' '} </td>`
+                }
             }
         }
         strHTML += '</tr>'
@@ -61,147 +95,55 @@ function printMat(mat, selector) {
 console.log(gBoard);
 
 function cellClicked(elCell) {
+
     var i = +elCell.dataset.i;
     var j = +elCell.dataset.j;
-    renderCell({ i, j }, gBoard[i][j])
+    console.log(gBoard[i][j]);
+
+    gColorCell = 'white';
+    renderCell({ i, j }, gBoard[i][j], gColorCell)
+
+    // window.oncontextmenu = function(e) {
+    //     e.preventDefault()
+    //     renderCell({ i, j }, FLAG, gColorCell)
+    // }
     for (var h = 0; h < gMinesCountArr.length; h++) {
         if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
             gBoard[i][j] = gMinesCountArr[h].numOfNegs;
             if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ')
+                renderCell({ i, j }, ' ', gColorCell)
                 renderNegs(i, j);
-
-            } else {
-                renderCell({ i, j }, gBoard[i][j])
-
-            }
+            } else
+                renderCell({ i, j }, gBoard[i][j], gColorCell)
         }
     }
     window.oncontextmenu = function(e) {
         e.preventDefault()
-        renderCell({ i, j }, FLAG)
-
+        renderCell({ i, j }, FLAG, gColorCell)
+    }
+    if (gBoard[i][j] === MINE) {
+        gClickOnMineCount++;
+        if (gClickOnMineCount < 3) {
+            if (gClickOnMineCount === 1) {
+                document.querySelector('.fails span').innerText = '⭕⭕❌';
+                document.querySelector('.smily span').innerText = '🤯';
+            }
+            if (gClickOnMineCount === 2) {
+                document.querySelector('.fails span').innerText = '⭕❌❌';
+                document.querySelector('.smily span').innerText = '🤯';
+            }
+        } else {
+            revealMines(gBoard)
+            gameOver();
+        }
     }
 }
 
 
-function renderCell(pos, value) {
+function renderCell(pos, value, color) {
     var elCell = document.querySelector(`[data-i="${pos.i}"][data-j="${pos.j}"]`);
-    // elCell.style.backgroundColor = 'grey';
+    elCell.style.backgroundColor = color;
     elCell.innerText = value
-}
-
-function renderNegs(idxI, idxJ) {
-
-    var i = idxI + 1;
-    var j = idxJ + 1;
-    console.log({ i, j });
-    gIdxArr.push({ i, j })
-    var i = idxI - 1;
-    var j = idxJ - 1;
-    console.log({ i, j });
-    gIdxArr.push({ i, j })
-    var i = idxI + 1;
-    var j = idxJ - 1;
-    console.log({ i, j });
-    gIdxArr.push({ i, j })
-    var i = idxI - 1;
-    var j = idxJ + 1;
-    console.log({ i, j });
-    gIdxArr.push({ i, j })
-    var i = idxI;
-    var j = idxJ + 1;
-    console.log({ i, j });
-    gIdxArr.push({ i, j })
-    var i = idxI;
-    var j = idxJ - 1;
-    console.log({ i, j });
-    gIdxArr.push({ i, j });
-    var i = idxI + 1;
-    var j = idxJ;
-    console.log({ i, j });
-    gIdxArr.push({ i, j })
-    var i = idxI - 1;
-    var j = idxJ;
-    console.log({ i, j });
-    gIdxArr.push({ i, j })
-    console.log(gIdxArr);
-
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-
-    var i = idxI - 1;
-    var j = idxJ - 1;
-    console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-    var i = idxI + 1;
-    var j = idxJ - 1;
-    console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-    var i = idxI - 1;
-    var j = idxJ + 1;
-    console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-    var i = idxI;
-    var j = idxJ + 1;
-    console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-    var i = idxI;
-    var j = idxJ - 1;
-    console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-    var i = idxI + 1;
-    var j = idxJ;
-    console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-    var i = idxI - 1;
-    var j = idxJ;
-    console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            renderCell({ i, j }, gBoard[i][j])
-        }
-    }
-
-
-    // console.log({ currPosI, currPosJ });
-    // renderCell({ currPosI, currPosJ }, gBoard[currPosI][currPosJ])
-    // console.log({ currPosI, currPosJ }, gBoard[currPosI][currPosJ])
 }
 
 
@@ -232,6 +174,32 @@ function setMinesNegsCount(board) {
     }
 }
 
+function revealMines(board) {
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[0].length; j++) {
+            if (board[i][j] === MINE) {
+                gColorCell = 'red'
+                renderCell({ i, j }, MINE, gColorCell)
+            }
+        }
+    }
+}
+
+function gameOver() {
+    console.log('game over');
+    document.querySelector('.smily span').innerText = '😫';
+    document.querySelector('.fails span').innerText = '❌❌❌';
+    gGame.isOn = false;
+}
+
+function restart() {
+    document.querySelector('.smily span').innerText = '😀';
+    document.querySelector('.fails span').innerText = '⭕⭕⭕';
+    // document.querySelector('.board').style.display = 'none';
+    initGame();
+    // clearInterval(gInterval);
+
+}
 // window.oncontextmenu = function() {
 //     addFlag();
 //     return false; // cancel default menu

@@ -66,6 +66,7 @@ function revealNegsWithMines(rowIdx, colIdx, mat) {
 }
 
 function renderNegsBack(rowIdx, colIdx, mat) {
+    gColorCell = 'silver'
     for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
         if (i < 0 || i >= mat.length) continue;
         for (var j = colIdx - 1; j <= colIdx + 1; j++) {
@@ -76,13 +77,13 @@ function renderNegsBack(rowIdx, colIdx, mat) {
                     gBoard[i][j] = gMinesCountArr[h].numOfNegs;
                     if (gMinesCountArr[h].numOfNegs === 0) {
                         renderCell({ i, j }, ' ', gColorCell)
-                            // gShownCells--;
-                            // gBoard[i][j].isShown = true;
+                        gShownCells--;
+                        // gBoard[i][j].isShown = true;
                     } else {
                         renderCell({ i, j }, ' ', gColorCell)
-                            // gShownCells++;
-                            // console.log(gShownCells);
-                            // gBoard[i][j].isShown = true;
+                        gShownCells++;
+                        // console.log(gShownCells);
+                        // gBoard[i][j].isShown = true;
                     }
                 } else if (gBoard[i][j] === MINE) {
                     renderCell({ i, j }, ' ', gColorCell)

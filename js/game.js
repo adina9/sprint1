@@ -122,7 +122,7 @@ function setFlag(event, elCell) {
 }
 
 function cellClicked(elCell) {
-    var whiteCells = 0;
+
     // isVictory = false;
     var i = +elCell.dataset.i;
     var j = +elCell.dataset.j;
@@ -198,23 +198,24 @@ function cellClicked(elCell) {
             gameOver();
         }
     }
-
-    for (var i = 0; i < gBoard.length; i++) {
-        for (var j = 0; j < gBoard[0].length; j++) {
-            var elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`);
-            if (elCell.style.backgroundColor === 'white')
-                whiteCells++;
-            else if (elCell.style.backgroundColor === 'red')
-                whiteCells--;
-        }
-    }
-    if (whiteCells === (gBoard.length ** 2) - gMinesArr.length) {
-        if (isVictory) {
-            document.querySelector('.smily span').innerText = '😎';
-            // gGame.isOn = false;
-            // setBoardSize();
-        }
-    }
+    // var whiteCells = 0;
+    // for (var i = 0; i < gBoard.length; i++) {
+    //     for (var j = 0; j < gBoard[0].length; j++) {
+    //         var elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`);
+    //         if (elCell.style.backgroundColor === 'white')
+    //             whiteCells++;
+    //         else if (elCell.style.backgroundColor === 'red')
+    //             whiteCells--;
+    //     }
+    // }
+    // if (whiteCells === (gBoard.length ** 2) - gMinesArr.length) {
+    //     if (isVictory) {
+    //         document.querySelector('.smily span').innerText = '😎';
+    //         // gGame.isOn = false;
+    //         // setBoardSize();
+    //     }
+    // }
+    checkVic();
 
 }
 
@@ -268,6 +269,26 @@ function gameOver() {
     document.querySelector('.fails span').innerText = '❌❌❌';
     // setBoardSize();
     // gGame.isOn = false;
+}
+
+function checkVic() {
+    var whiteCells = 0;
+    for (var i = 0; i < gBoard.length; i++) {
+        for (var j = 0; j < gBoard[0].length; j++) {
+            var elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`);
+            if (elCell.style.backgroundColor === 'white')
+                whiteCells++;
+            else if (elCell.style.backgroundColor === 'red')
+                whiteCells--;
+        }
+    }
+    if (whiteCells === (gBoard.length ** 2) - gMinesArr.length) {
+        if (isVictory) {
+            document.querySelector('.smily span').innerText = '😎';
+            // gGame.isOn = false;
+            // setBoardSize();
+        }
+    }
 }
 
 function isVictory(board) {

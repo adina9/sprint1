@@ -1,164 +1,93 @@
 'use strict'
 
-function renderNegs(idxI, idxJ) {
-    gColorCell = 'white'
-    var i = idxI + 1;
-    var j = idxJ + 1;
-    gIdxArr.push({ i, j })
-    var i = idxI - 1;
-    var j = idxJ - 1;
-    gIdxArr.push({ i, j })
-    var i = idxI + 1;
-    var j = idxJ - 1;
-    gIdxArr.push({ i, j })
-    var i = idxI - 1;
-    var j = idxJ + 1;
-    gIdxArr.push({ i, j })
-    var i = idxI;
-    var j = idxJ + 1;
-    gIdxArr.push({ i, j })
-    var i = idxI;
-    var j = idxJ - 1;
-    gIdxArr.push({ i, j });
-    var i = idxI + 1;
-    var j = idxJ;
-    gIdxArr.push({ i, j })
-    var i = idxI - 1;
-    var j = idxJ;
-    gIdxArr.push({ i, j })
-        // console.log(gIdxArr);
+function renderNegs(rowIdx, colIdx, mat) {
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i >= mat.length) continue;
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue;
+            if (i === rowIdx && j === colIdx) continue;
+            for (var h = 0; h < gMinesCountArr.length; h++) {
+                if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
+                    gBoard[i][j] = gMinesCountArr[h].numOfNegs;
+                    if (gMinesCountArr[h].numOfNegs === 0) {
+                        renderCell({ i, j }, ' ', gColorCell)
+                            // gWhiteCells++;
+                            // console.log(gWhiteCells);
+                        gShownCells++;
+                        console.log(gShownCells);
 
-    var i = idxI + 1;
-    var j = idxJ + 1;
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
-                }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
-        }
-    }
+                    } else {
+                        renderCell({ i, j }, gBoard[i][j], gColorCell)
+                        gShownCells++;
+                        console.log(gShownCells);
 
-    var i = idxI - 1;
-    var j = idxJ - 1;
-    // console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
+                    }
                 }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
+            }
         }
     }
-    var i = idxI + 1;
-    var j = idxJ - 1;
-    // console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
+    // for (var i = 0; i < mat.length; i++) {
+    //     for (var j = 0; j < mat[0].length; j++) {
+    //         var elCell = document.querySelector(`[data-i="${i}"][data-j="${j}"]`);
+    //         if (elCell.style.backgroundColor === 'white') {
+    //             gWhiteCells++;
+    //             console.log(gWhiteCells);
+    //         }
+    //     }
+    // }
+}
+
+function revealNegsWithMines(rowIdx, colIdx, mat) {
+    // gColorCell = ''
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i >= mat.length) continue;
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue;
+            if (i === rowIdx && j === colIdx) continue;
+            for (var h = 0; h < gMinesCountArr.length; h++) {
+                if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
+                    gBoard[i][j] = gMinesCountArr[h].numOfNegs;
+                    if (gMinesCountArr[h].numOfNegs === 0) {
+                        renderCell({ i, j }, ' ', gColorCell)
+                            // gBoard[i][j].isShown = true;
+                    } else {
+                        renderCell({ i, j }, gBoard[i][j], gColorCell)
+                            // gShownCells++;
+                            // console.log(gShownCells);
+                            // gBoard[i][j].isShown = true;
+                    }
+                } else if (gBoard[i][j] === MINE) {
+                    renderCell({ i, j }, gBoard[i][j], gColorCell)
                 }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
-        }
-    }
-    var i = idxI - 1;
-    var j = idxJ + 1;
-    // console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
-                }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
-        }
-    }
-    var i = idxI;
-    var j = idxJ + 1;
-    // console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
-                }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
-        }
-    }
-    var i = idxI;
-    var j = idxJ - 1;
-    // console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
-                }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
-        }
-    }
-    var i = idxI + 1;
-    var j = idxJ;
-    // console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
-                }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
-        }
-    }
-    var i = idxI - 1;
-    var j = idxJ;
-    // console.log({ i, j });
-    for (var h = 0; h < gMinesCountArr.length; h++) {
-        if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
-            gBoard[i][j] = gMinesCountArr[h].numOfNegs;
-            if (gMinesCountArr[h].numOfNegs === 0) {
-                renderCell({ i, j }, ' ', gColorCell)
-                window.oncontextmenu = function(e) {
-                    e.preventDefault()
-                    renderCell({ i, j }, FLAG, gColorCell)
-                }
-            } else
-                renderCell({ i, j }, gBoard[i][j], gColorCell)
+            }
         }
     }
 
+}
 
-    // console.log({ currPosI, currPosJ });
-    // renderCell({ currPosI, currPosJ }, gBoard[currPosI][currPosJ])
-    // console.log({ currPosI, currPosJ }, gBoard[currPosI][currPosJ])
+function renderNegsBack(rowIdx, colIdx, mat) {
+    for (var i = rowIdx - 1; i <= rowIdx + 1; i++) {
+        if (i < 0 || i >= mat.length) continue;
+        for (var j = colIdx - 1; j <= colIdx + 1; j++) {
+            if (j < 0 || j >= mat[i].length) continue;
+            if (i === rowIdx && j === colIdx) continue;
+            for (var h = 0; h < gMinesCountArr.length; h++) {
+                if (gMinesCountArr[h].i === i && gMinesCountArr[h].j === j) {
+                    gBoard[i][j] = gMinesCountArr[h].numOfNegs;
+                    if (gMinesCountArr[h].numOfNegs === 0) {
+                        renderCell({ i, j }, ' ', gColorCell)
+                            // gShownCells--;
+                            // gBoard[i][j].isShown = true;
+                    } else {
+                        renderCell({ i, j }, ' ', gColorCell)
+                            // gShownCells++;
+                            // console.log(gShownCells);
+                            // gBoard[i][j].isShown = true;
+                    }
+                } else if (gBoard[i][j] === MINE) {
+                    renderCell({ i, j }, ' ', gColorCell)
+                }
+            }
+        }
+    }
 }
